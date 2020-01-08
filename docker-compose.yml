@@ -1,0 +1,43 @@
+version : "3.7"
+
+
+services:
+
+  # visualisation
+  website:
+    build: ./services/webapp
+    env_file:
+      - './config/webapp.env'
+      - './config/shared_database.env'
+    ports:
+      - '5000:80'
+
+  # celery:
+  #   build: ./services/webapp
+  #   command: celery worker -l info -A app.app.blueprints.bptest2.tasks
+  #   env_file:
+  #     - './config/webapp.env'
+  #     - './config/shared_database.env'
+
+
+  # Misc Storage
+  postgres:
+    container_name: "social_crawler_postgres"
+    restart: "always"
+    image: postgres
+    env_file:
+      - ./config/postgres.env
+      - ./config/shared_database.env
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data/
+      - ./services/postgres/:/docker-entrypoint-initdb.d/
+    ports:
+      - 5432:5432
+
+  redis:
+      container_name: "social_crawler_redis"
+      image: 'redis:5.0.7'
+      command: redis-server --requirepass TCPYkerxvKQu
+
+volumes:
+  postgres_volume:
